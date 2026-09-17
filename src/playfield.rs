@@ -19,7 +19,32 @@ pub struct Playfield<'a> {
 }
 
 impl<'a> Playfield<'a> {
-    const DEBUG_LINES: bool = true;
+    const DEBUG_LINES: bool = false;
+
+    pub fn draw_tiles_connections(&self) {
+        let mut col = 0;
+        for tile_y in &self.tiles {
+            let mut row = 0;
+            for tile in tile_y {
+                for agent in &tile.agents {
+                    let x: usize = self.get_agent_column(agent);
+                    let y: usize = self.get_agent_row(agent);
+
+                    draw_line(
+                        agent.coord.x(),
+                        agent.coord.y(),
+
+                        col as f32 * self.tiles_width()  + self.tiles_width()/2. ,
+                        row as f32 * self.tiles_height()  + self.tiles_height()/2.,
+                        2.,
+                        BLUE
+                    )
+                }
+                row += 1;
+            }
+            col += 1;
+        }
+    }
 
     fn draw(&self) {
         draw_rectangle_lines(self.coord.x(), self.coord.y(),  self.size.x(),  self.size.y(), 2.0, RED);

@@ -27,6 +27,7 @@ async fn main() {
         if ( tick % GRAPHICS_UPDATE_RATE == 0) {
             clear_background(BLACK);
             field1.render_everyone();
+            field1.draw_tiles_connections();
 
             field1.logic_update();
             println!("ticck {tick}");
@@ -61,6 +62,8 @@ impl<'a> Tile<'a> {
     pub fn pop_agent(&mut self, agent: Agent) {
        // self.agents.
     }
+
+
 
     pub fn clear(&mut self) {
         self.agents.clear();
