@@ -58,6 +58,17 @@ impl<'a, T> VelistAmbigiousIter<T> {
         };
         velist.get_element_n_mut(self.index)
     }
+
+
+    /// Creates invalid iterator, to avoid using Option<>.
+    /// This iterator will always fail
+    pub fn create_invalid() -> Self {
+        VelistAmbigiousIter {
+            last_known_node_id: 0,
+            index: 0,
+            parent: 0 as *const Velist<T>
+        }
+    }
 }
 
 impl<T> VelistAmbigiousIter<T> {

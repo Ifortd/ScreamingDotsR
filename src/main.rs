@@ -4,12 +4,13 @@ mod playfield;
 
 mod velist;
 
+use std::cell::RefCell;
 use crate::playfield::Playfield;
 use crate::point::Point;
 use std::f32::consts::PI;
 
 use macroquad::prelude::*;
-
+use crate::velist::velist::{Velist, VelistAmbigiousIter};
 
 const PLAYFIELD_TILES: usize = 10;
 const GRAPHICS_UPDATE_RATE: u32 = 1;
@@ -48,26 +49,26 @@ struct Agent {
     direction: Point,
     speed: f32,
     rad: f32,
+    position: VelistAmbigiousIter< RefCell<Agent> >
 }
 
 struct Tile<'a> {
-    agents: Vec<&'a Agent>,
+    agents: Velist<&'a Agent>,
     //owner: &'owner_life  Playfield<'owner_life>
 }
 impl<'a> Tile<'a> {
     pub fn new() -> Tile<'a> {
-        Tile{ agents: vec![]}
+        Tile{ agents: Velist::new() }
     }
 
     pub fn push_agent(&mut self, agent: &'a Agent) {
-        self.agents.push(agent);
+        self.agents.push_last(agent);
     }
     pub fn pop_agent(&mut self, agent: Agent) {
+
        // self.agents.
     }
-
-
-
+    
     pub fn clear(&mut self) {
         self.agents.clear();
     }
@@ -76,7 +77,7 @@ impl<'a> Tile<'a> {
 
 impl Default for Agent {
     fn default() -> Self {
-        Agent{coord: Point::default(), direction: Point::default(), speed: Agent::DEFAULT_AGENT_SPEED, rad: Agent::DEFAULT_AGENT_SIZE}
+        Agent{coord: Point::default(), direction: Point::default(), speed: Agent::DEFAULT_AGENT_SPEED, rad: Agent::DEFAULT_AGENT_SIZE, position: VelistAmbigiousIter::create_invalid() }
     }
 }
 
@@ -100,7 +101,9 @@ impl Agent {
         let mut direction = Point::default( );
         direction.rotate_by(rotation);
         direction.normalise_self_to( speed );
-        Agent{coord:pos, direction:direction, speed: speed, rad: Self::DEFAULT_AGENT_SIZE}
+        let mut out = Agent{coord:pos, direction:direction, speed: speed, rad: Self::DEFAULT_AGENT_SIZE, position: VelistAmbigiousIter::create_invalid() }
+        //tile.push_agent(&out);
+        out
     }
 
     fn draw(&self, x_offset: f32, y_offset: f32) {

@@ -14,7 +14,7 @@ pub struct Playfield<'a> {
     graphics_update_rate: u64,
     current_tick: u64,
     //agents: Vec<Agent>,
-    agents: RefCell<Vec<Agent>>,
+    agents: Vec<Rc<RefCell<Agent>>>,
     tiles: [ [Tile<'a>; PLAYFIELD_TILES]; PLAYFIELD_TILES]
 }
 
@@ -26,7 +26,7 @@ impl<'a> Playfield<'a> {
         for tile_y in &self.tiles {
             let mut row = 0;
             for tile in tile_y {
-                for agent in &tile.agents {
+               /* for agent in &tile.agents {
                     let x: usize = self.get_agent_column(agent);
                     let y: usize = self.get_agent_row(agent);
 
@@ -39,7 +39,7 @@ impl<'a> Playfield<'a> {
                         2.,
                         BLUE
                     )
-                }
+                }*/
                 row += 1;
             }
             col += 1;
@@ -93,7 +93,7 @@ impl<'a> Playfield<'a> {
         ( agent.coord.y() / (self.size.y() +1. ) * PLAYFIELD_TILES as f32   )as usize
     }
 
-    fn attach_agent_to_tile(&mut self, agent: &'a Agent) {
+    fn attach_agent_to_tile(&mut self, agent: &mut RefCell<Agent>) {
         let x: usize = self.get_agent_column(agent);
         let y: usize = self.get_agent_row(agent);
 
@@ -125,7 +125,7 @@ impl<'a> Playfield<'a> {
 
     }
 
-    fn walk_agent(&mut self, agent: &mut Agent) {
+    fn walk_agent(&mut self, agent: &mut RefCell<Agent>) {
 
         agent.step_forward();
         agent.rotate_randomly();
@@ -162,8 +162,8 @@ impl<'a> Playfield<'a> {
             //let mut agents = std::mem::take(&mut self.agents);
             let mut agents =  self.agents.as_ptr();
             unsafe {
-                for i in 0..(*agents).len() {
-                    let mut agent = (&mut (*agents)).get_mut(i).unwrap();
+                for i in 0..(self.agents).len() {
+                    let mut agent = self.agents.get_mut(i).unwrap();
                     self.walk_agent(  agent) ;
                     self.attach_agent_to_tile( agent);
                 }
